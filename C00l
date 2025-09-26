@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chat Interface</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #4cc9f0, #4361ee);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .subtitle {
+            color: #a0a0a0;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .model-selector-top {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .model-display {
+            background: rgba(30, 30, 46, 0.9);
+            border-radius: 10px;
+            padding: 12px 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(76, 201, 240, 0.3);
+            min-width: 200px;
+            justify-content: center;
+        }
+
+        .model-display:hover {
+            background: rgba(40, 40, 60, 0.9);
+        }
+
+        .model-options {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(30, 30, 46, 0.95);
+            border-radius: 10px;
+            padding: 10px;
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            width: 200px;
+            z-index: 100;
+            border: 1px solid rgba(76, 201, 240, 0.3);
+            margin-top: 5px;
+        }
+
+        .model-options.show {
+            display: flex;
+        }
+
+        .model-option {
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .model-option:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .model-option.active {
+            background: rgba(76, 201, 240, 0.2);
+            border-left: 3px solid #4cc9f0;
+        }
+
+        .model-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .grok-icon {
+            background: #ff6b6b;
+        }
+
+        .chatgpt-icon {
+            background: #10a37f;
+        }
+
+        .deepseek-icon {
+            background: #6c5ce7;
+        }
+
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: rgba(30, 30, 46, 0.7);
+            border-radius: 10px;
+            overflow: hidden;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .chat-header {
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .current-model {
+            font-weight: bold;
+            color: #4cc9f0;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-height: 500px;
+            min-height: 400px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            line-height: 1.4;
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background: #4361ee;
+            border-bottom-right-radius: 5px;
+        }
+
+        .ai-message {
+            align-self: flex-start;
+            background: rgba(255, 255, 255, 0.1);
+            border-bottom-left-radius: 5px;
+        }
+
+        .message-sender {
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+            opacity: 0.7;
+        }
+
+        .chat-input-container {
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .chat-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .send-button {
+            padding: 12px 20px;
+            background: #4361ee;
+            border: none;
+            border-radius: 20px;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .send-button:hover {
+            background: #3a56d4;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #a0a0a0;
+            font-size: 0.9rem;
+        }
+
+        .typing-indicator {
+            display: none;
+            align-self: flex-start;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 18px;
+            padding: 12px 16px;
+            border-bottom-left-radius: 5px;
+            color: #a0a0a0;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .message {
+                max-width: 90%;
+            }
+            
+            .model-selector-top {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .model-options {
+                position: static;
+                transform: none;
+                width: 100%;
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>AI Chat Interface</h1>
+            <p class="subtitle">Chat with multiple AI models using OpenRouter</p>
+            
+            <div class="model-selector-top">
+                <div class="model-display" id="modelDisplay">
+                    <div class="model-icon grok-icon">G</div>
+                    <span>Grok 4 Fast</span>
+                    <span style="margin-left: auto;">▼</span>
+                </div>
+                
+                <div class="model-options" id="modelOptions">
+                    <div class="model-option active" data-model="xai-ai/grok-4-fast">
+                        <div class="model-icon grok-icon">G</div>
+                        <span>Grok 4 Fast</span>
+                    </div>
+                    <div class="model-option" data-model="openai/gpt-3.5-turbo">
+                        <div class="model-icon chatgpt-icon">C</div>
+                        <span>ChatGPT 3.5 Turbo</span>
+                    </div>
+                    <div class="model-option" data-model="deepseek/deepseek-chat">
+                        <div class="model-icon deepseek-icon">D</div>
+                        <span>DeepSeek</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <div class="chat-container">
+            <div class="chat-header">
+                <span>Currently chatting with:</span>
+                <span class="current-model">Grok 4 Fast</span>
+            </div>
+            
+            <div class="chat-messages">
+                <div class="message ai-message">
+                    <div class="message-sender">AI Assistant</div>
+                    Hello! I'm your AI assistant. How can I help you today?
+                </div>
+            </div>
+            
+            <div class="typing-indicator">AI is typing...</div>
+            
+            <div class="chat-input-container">
+                <input type="text" class="chat-input" placeholder="Type your message here...">
+                <button class="send-button">Send</button>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>Powered by OpenRouter | This interface connects to AI models through the OpenRouter API</p>
+    </footer>
+
+    <script>
+        // Configuration - Replace with your actual OpenRouter API key
+        const OPENROUTER_API_KEY = "your-openrouter-api-key-here";
+        
+        // DOM Elements
+        const modelDisplay = document.getElementById('modelDisplay');
+        const modelOptions = document.getElementById('modelOptions');
+        const modelOptionElements = document.querySelectorAll('.model-option');
+        const currentModelElement = document.querySelector('.current-model');
+        const chatMessages = document.querySelector('.chat-messages');
+        const chatInput = document.querySelector('.chat-input');
+        const sendButton = document.querySelector('.send-button');
+        const typingIndicator = document.querySelector('.typing-indicator');
+
+        // Current state
+        let currentModel = 'xai-ai/grok-4-fast';
+
+        // Toggle model options dropdown
+        modelDisplay.addEventListener('click', () => {
+            modelOptions.classList.toggle('show');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!modelDisplay.contains(e.target) && !modelOptions.contains(e.target)) {
+                modelOptions.classList.remove('show');
+            }
+        });
+
+        // Model selection
+        modelOptionElements.forEach(option => {
+            option.addEventListener('click', () => {
+                // Remove active class from all options
+                modelOptionElements.forEach(opt => opt.classList.remove('active'));
+                
+                // Add active class to clicked option
+                option.classList.add('active');
+                
+                // Update current model
+                currentModel = option.getAttribute('data-model');
+                const modelName = option.querySelector('span').textContent;
+                currentModelElement.textContent = modelName;
+                
+                // Update model display
+                modelDisplay.innerHTML = `
+                    <div class="model-icon ${option.querySelector('.model-icon').classList[1]}">
+                        ${option.querySelector('.model-icon').textContent}
+                    </div>
+                    <span>${modelName}</span>
+                    <span style="margin-left: auto;">▼</span>
+                `;
+                
+                // Close dropdown
+                modelOptions.classList.remove('show');
+                
+                // Add a system message about model change
+                addMessage('system', `Switched to ${modelName}`);
+            });
+        });
+
+        // Send message function
+        function sendMessage() {
+            const message = chatInput.value.trim();
+            if (!message) return;
+            
+            // Add user message to chat
+            addMessage('user', message);
+            chatInput.value = '';
+            
+            // Show typing indicator
+            typingIndicator.style.display = 'block';
+            
+            // Check if API key is configured
+            if (OPENROUTER_API_KEY === "your-openrouter-api-key-here") {
+                addMessage('ai', 'Error: Please configure your OpenRouter API key in the code.');
+                typingIndicator.style.display = 'none';
+                return;
+            }
+            
+            // Send request to OpenRouter
+            fetch('https://openrouter.ai/api/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+                    'HTTP-Referer': window.location.href,
+                    'X-Title': 'AI Chat Interface'
+                },
+                body: JSON.stringify({
+                    model: currentModel,
+                    messages: [
+                        {
+                            role: 'user',
+                            content: message
+                        }
+                    ]
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Hide typing indicator
+                typingIndicator.style.display = 'none';
+                
+                // Add AI response to chat
+                if (data.choices && data.choices.length > 0) {
+                    addMessage('ai', data.choices[0].message.content);
+                } else {
+                    addMessage('ai', 'Sorry, I encountered an error. Please try again.');
+                }
+            })
+            .catch(error => {
+                // Hide typing indicator
+                typingIndicator.style.display = 'none';
+                
+                // Show error message
+                addMessage('ai', `Error: ${error.message}. Please check your API key and try again.`);
+            });
+        }
+
+        // Add message to chat
+        function addMessage(sender, content) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message');
+            
+            if (sender === 'user') {
+                messageElement.classList.add('user-message');
+                messageElement.innerHTML = `<div class="message-sender">You</div>${content}`;
+            } else if (sender === 'ai') {
+                messageElement.classList.add('ai-message');
+                messageElement.innerHTML = `<div class="message-sender">AI Assistant</div>${content}`;
+            } else {
+                // System message
+                messageElement.classList.add('ai-message');
+                messageElement.style.fontStyle = 'italic';
+                messageElement.style.opacity = '0.7';
+                messageElement.innerHTML = `<div class="message-sender">System</div>${content}`;
+            }
+            
+            chatMessages.appendChild(messageElement);
+            
+            // Scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Event listeners
+        sendButton.addEventListener('click', sendMessage);
+        
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
