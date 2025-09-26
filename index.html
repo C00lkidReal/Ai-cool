@@ -289,7 +289,7 @@
                 </div>
                 
                 <div class="model-options" id="modelOptions">
-                    <div class="model-option active" data-model="xai-ai/grok-4-fast">
+                    <div class="model-option active" data-model="x-ai/grok-4-fast:free">
                         <div class="model-icon grok-icon">G</div>
                         <span>Grok 4 Fast</span>
                     </div>
@@ -297,9 +297,9 @@
                         <div class="model-icon chatgpt-icon">C</div>
                         <span>ChatGPT 3.5 Turbo</span>
                     </div>
-                    <div class="model-option" data-model="deepseek/deepseek-chat">
+                    <div class="model-option" data-model="deepseek/deepseek-chat-v3.1:free">
                         <div class="model-icon deepseek-icon">D</div>
-                        <span>DeepSeek</span>
+                        <span>DeepSeek v3.1</span>
                     </div>
                 </div>
             </div>
@@ -332,7 +332,7 @@
     </footer>
 
     <script>
-        // Configuration - Replace with your actual OpenRouter API key
+        // Configuration - Your OpenRouter API key is already set
         const OPENROUTER_API_KEY = "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";
         
         // DOM Elements
@@ -346,7 +346,7 @@
         const typingIndicator = document.querySelector('.typing-indicator');
 
         // Current state
-        let currentModel = 'xai-ai/grok-4-fast';
+        let currentModel = 'x-ai/grok-4-fast:free';
 
         // Toggle model options dropdown
         modelDisplay.addEventListener('click', () => {
